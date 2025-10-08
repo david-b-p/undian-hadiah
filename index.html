@@ -1,235 +1,520 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Undian Acak HKBP Majapahit Mojokerto</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Undian Acak - HKBP Majapahit Mojokerto (v6)</title>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f4f7fa;
-      margin: 0;
-      padding: 0;
-      text-align: center;
+    :root{
+      --primary: #003366;
+      --accent: #e6b800;
+      --muted: #6c757d;
+      --danger: #c0392b;
+      --bg: #f5f7fb;
     }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #003366;
-      color: white;
-      padding: 10px 20px;
-      position: relative;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:#111;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    header img {
-      position: absolute;
-      left: 20px;
-      height: 50px;
+
+    /* HEADER */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px 16px;
+      background:var(--primary);
+      color:white;
+      position:relative;
     }
-    h1 {
-      font-size: 20px;
-      margin: 0;
+    header img{
+      position:absolute;
+      left:16px;
+      height:58px;
+      width:auto;
     }
-    main {
-      margin: 20px;
+    header h1{
+      margin:0;
+      font-size:18px;
+      text-align:center;
+      line-height:1.2;
     }
-    .input-section {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: inline-block;
+
+    /* CONTAINER */
+    .wrap{
+      max-width:1100px;
+      margin:20px auto;
+      padding:12px;
     }
-    input, select, button {
-      margin: 5px;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+
+    .card{
+      background:white;
+      border-radius:10px;
+      box-shadow:0 8px 30px rgba(20,30,60,0.06);
+      padding:16px;
     }
-    button {
-      background: #003366;
-      color: white;
-      cursor: pointer;
+
+    /* Controls layout */
+    .controls-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+      align-items:end;
     }
-    button:hover {
-      background: #0055aa;
+    label.field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:14px;
     }
-    #result {
-      font-size: 40px;
-      margin: 20px 0;
-      font-weight: bold;
+    input[type="text"], input[type="number"], select {
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #e3e6ea;
+      font-size:14px;
     }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 90%;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    .controls-actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
+    button{
+      padding:10px 14px;
+      border-radius:8px;
+      border:0;
+      cursor:pointer;
+      font-weight:600;
     }
-    th {
-      background: #003366;
-      color: white;
+    .btn-primary{ background:var(--primary); color:white; }
+    .btn-muted{ background:#eef1f5; color:var(--muted); }
+    .btn-danger{ background:var(--danger); color:white; }
+
+    /* Slider confetti row */
+    .confetti-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
     }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
+    input[type="range"]{ width:220px; }
+
+    /* Result / animation area */
+    .result-box{
+      margin-top:14px;
+      text-align:center;
+      padding:18px;
+      border-radius:8px;
+      background:linear-gradient(90deg,#fff 0%, #fbfbfb 100%);
+      min-height:120px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
     }
-    .coret {
-      text-decoration: line-through;
-      color: red;
+    #spinner{
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      border:6px solid rgba(0,0,0,0.08);
+      border-left-color:var(--primary);
+      animation: spin 1s linear infinite;
+      display:none;
+    }
+    @keyframes spin{ to { transform: rotate(360deg); } }
+
+    #rollingNumber{
+      font-size:56px;
+      font-weight:800;
+      color:var(--accent);
+      min-width:140px;
+      min-height:64px;
+    }
+    .small-muted{ color:var(--muted); font-size:13px; }
+
+    /* Tables / history */
+    .history-wrap{ margin-top:18px; display:flex; flex-direction:column; gap:18px; }
+    .prize-block{ background:white; border-radius:8px; padding:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+    .prize-block h3{ margin:0 0 8px 0; font-size:16px; color:var(--primary) }
+    table{ width:100%; border-collapse:collapse; font-size:14px; }
+    th, td{ padding:10px; border:1px solid #eef1f3; text-align:center; }
+    th{ background:var(--primary); color:white; font-weight:700; }
+    tr.coret td.number { text-decoration:line-through; color:var(--danger); }
+
+    .actions-cell button{ margin:0 4px; padding:6px 8px; font-size:13px; border-radius:6px; }
+    .coret-btn{ background:#fff2f2; color:var(--danger); border:1px solid #f5c6c6; }
+    .uncoret-btn{ background:#eef7ee; color:#1b7a3a; border:1px solid #cdeacc; }
+    .remove-btn{ background:#ffe9d6; color:#8a4b00; border:1px solid #f0c9a7; }
+
+    /* confetti canvas */
+    canvas#confetti{
+      position:fixed;
+      top:0; left:0; width:100%; height:100%;
+      pointer-events:none; z-index:9999;
+      opacity:0; transition:opacity 1s ease;
+    }
+    canvas#confetti.show{ opacity:1; }
+
+    /* Responsive */
+    @media (max-width:880px){
+      .controls-grid{ grid-template-columns: 1fr; }
+      input[type="range"]{ width:100%; }
+      .confetti-row{ flex-direction:column; align-items:flex-start; gap:6px; }
+      #rollingNumber{ font-size:44px; min-height:54px; }
+      #spinner{ width:44px; height:44px; border-width:5px; }
+    }
+
+    @media (max-width:480px){
+      header h1{ font-size:16px; padding:0 40px; }
+      #rollingNumber{ font-size:36px; }
+      .controls-grid{ gap:10px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/HKBP_Logo.png" alt="Logo HKBP">
-    <h1>Pesta Parheheon Ina - Gotilon HKBP Majapahit Mojokerto</h1>
+    <img src="logo_hkbp.png" alt="Logo HKBP">
+    <h1>Pesta Parheheon Ina - Gotilon<br>HKBP Majapahit Mojokerto</h1>
   </header>
 
-  <main>
-    <div class="input-section">
-      <h3>Pengaturan Undian</h3>
-      <div>
-        <label>Nama Hadiah:</label>
-        <input type="text" id="hadiah" placeholder="Contoh: Sabun Cuci">
+  <div class="wrap">
+    <div class="card">
+      <div class="controls-grid">
+        <label class="field">
+          <span>Nama Hadiah</span>
+          <input type="text" id="prizeName" placeholder="Contoh: Sabun Cuci" />
+        </label>
+
+        <label class="field">
+          <span>Jumlah Pemenang</span>
+          <input type="number" id="numWinners" value="1" min="1" />
+        </label>
+
+        <label class="field">
+          <span>Nomor Minimum</span>
+          <input type="number" id="minNum" value="1" min="1" />
+        </label>
+
+        <label class="field">
+          <span>Nomor Maksimum</span>
+          <input type="number" id="maxNum" value="100" min="1" />
+        </label>
+
+        <label class="field">
+          <span>Durasi Rolling tiap pemenang (detik)</span>
+          <input type="number" id="rollDuration" value="3" min="1" max="30" />
+        </label>
+
+        <div class="field">
+          <span style="margin-bottom:6px;display:block">Durasi Confetti (detik) <small class="small-muted" id="confVal">(3)</small></span>
+          <div class="confetti-row">
+            <input type="range" id="confettiSlider" min="0" max="10" value="3" />
+            <div class="controls-actions">
+              <button class="btn-primary" id="startBtn">Mulai Undian</button>
+              <button class="btn-muted" id="downloadBtn">Download CSV</button>
+              <button class="btn-danger" id="resetBtn">Reset</button>
+            </div>
+          </div>
+          <div class="small-muted" style="margin-top:6px">Set 0 untuk nonaktifkan confetti</div>
+        </div>
       </div>
-      <div>
-        <label>Nomor Minimum:</label>
-        <input type="number" id="min" value="1">
-        <label>Nomor Maksimum:</label>
-        <input type="number" id="max" value="100">
+
+      <div class="result-box" style="margin-top:14px">
+        <div id="spinner" aria-hidden="true"></div>
+        <div id="rollingNumber">-</div>
+        <div class="small-muted">Animasi rolling + spinner saat undian</div>
       </div>
-      <div>
-        <label>Jumlah Pemenang:</label>
-        <input type="number" id="jumlah" value="1" min="1">
+
+      <div class="history-wrap" id="historyWrap" style="margin-top:16px">
+        <!-- prize tables injected here -->
       </div>
-      <div>
-        <label>Durasi Tiap Undian (detik):</label>
-        <input type="number" id="durasi" value="3" min="1" max="10">
-      </div>
-      <button onclick="undi()">Mulai Undian</button>
-      <button onclick="downloadExcel()">Download Excel</button>
     </div>
+  </div>
 
-    <div id="result">-</div>
+  <!-- Audio (opsional) -->
+  <audio id="drumroll" src="drumroll.mp3"></audio>
+  <audio id="clap" src="clap.mp3"></audio>
 
-    <div id="tablesContainer"></div>
-  </main>
+  <!-- Confetti canvas -->
+  <canvas id="confetti"></canvas>
 
   <script>
-    let nomorTerpilih = {};
-    let sedangUndi = false;
+    /* ====== Data stores ====== */
+    const globalUsed = new Set(); // numbers already used globally
+    const prizeWinners = {}; // prize -> array of objects {num, crossed:bool, time}
+    const prizeTables = {}; // prize -> tbody element
 
-    function undi() {
-      if (sedangUndi) return;
-      const hadiah = document.getElementById("hadiah").value.trim();
-      const min = parseInt(document.getElementById("min").value);
-      const max = parseInt(document.getElementById("max").value);
-      const jumlah = parseInt(document.getElementById("jumlah").value);
-      const durasi = parseInt(document.getElementById("durasi").value) * 1000;
-      const resultEl = document.getElementById("result");
+    /* ====== UI refs ====== */
+    const spinner = document.getElementById('spinner');
+    const rollingNumber = document.getElementById('rollingNumber');
+    const confettiSlider = document.getElementById('confettiSlider');
+    const confVal = document.getElementById('confVal');
+    const startBtn = document.getElementById('startBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
-      if (!hadiah) return alert("Masukkan nama hadiah!");
-      if (min >= max) return alert("Rentang angka tidak valid!");
-      if (!nomorTerpilih[hadiah]) nomorTerpilih[hadiah] = [];
+    confettiSlider.addEventListener('input', ()=> confVal.textContent = `(${confettiSlider.value})`);
 
-      let sisaNomor = [];
-      for (let i = min; i <= max; i++) {
-        if (!Object.values(nomorTerpilih).flat().includes(i)) sisaNomor.push(i);
+    startBtn.addEventListener('click', startDraw);
+    downloadBtn.addEventListener('click', downloadCSV);
+    resetBtn.addEventListener('click', resetAll);
+
+    /* ====== Confetti ====== */
+    const confettiCanvas = document.getElementById('confetti');
+    const ctx = confettiCanvas.getContext('2d');
+    let confPieces = [], confAnimId = null, confActive = false;
+    function resizeCanvas(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createConfetti(n=120){
+      confPieces = [];
+      for(let i=0;i<n;i++){
+        confPieces.push({
+          x: Math.random()*confettiCanvas.width,
+          y: Math.random()*-confettiCanvas.height,
+          size: Math.random()*7+4,
+          speed: Math.random()*2+1.2,
+          angle: Math.random()*Math.PI*2,
+          rot: Math.random()*360,
+          color: `hsl(${Math.floor(Math.random()*360)}, 90%, 55%)`
+        });
       }
+    }
+    function drawConfetti(){
+      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+      confPieces.forEach(p=>{
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+        ctx.restore();
+        p.y += p.speed;
+        p.x += Math.sin(p.angle)*0.6;
+        p.rot += 4;
+        if(p.y > confettiCanvas.height + 10){
+          p.y = -10;
+          p.x = Math.random()*confettiCanvas.width;
+        }
+      });
+      confAnimId = requestAnimationFrame(drawConfetti);
+    }
+    function startConfetti(durationSec){
+      if(durationSec <= 0) return;
+      if(confActive) return;
+      confActive = true;
+      createConfetti(120);
+      confettiCanvas.classList.add('show'); // CSS fade-in
+      drawConfetti();
+      // after durationSec seconds, remove class to trigger fade-out (1s), then stop
+      setTimeout(()=>{
+        confettiCanvas.classList.remove('show');
+        setTimeout(stopConfetti, 1000); // 1s fade-out
+      }, durationSec*1000);
+    }
+    function stopConfetti(){
+      confActive = false;
+      if(confAnimId) cancelAnimationFrame(confAnimId);
+      confAnimId = null;
+      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    }
 
-      if (sisaNomor.length < jumlah) {
-        alert("Sisa nomor tidak cukup!");
+    /* ====== Utility: strikethrough using combining long stroke (for CSV) ====== */
+    function strikeText(str){
+      // add U+0336 combining long stroke overlay to each character
+      return str.split('').map(c => c + '\u0336').join('');
+    }
+
+    /* ====== Main draw logic (sequential reveal) ====== */
+    async function startDraw(){
+      // prevent double start
+      if(startBtn.disabled) return;
+      const prize = document.getElementById('prizeName').value.trim();
+      const min = parseInt(document.getElementById('minNum').value);
+      const max = parseInt(document.getElementById('maxNum').value);
+      let numWinners = parseInt(document.getElementById('numWinners').value) || 1;
+      const rollDurationSec = Math.max(1, parseInt(document.getElementById('rollDuration').value) || 3);
+      const confettiDuration = parseInt(confettiSlider.value) || 0;
+
+      if(!prize){ alert('Isi nama hadiah dulu'); return; }
+      if(isNaN(min) || isNaN(max) || min >= max){ alert('Rentang nomor tidak valid'); return; }
+      // build available numbers excluding globalUsed
+      const available = [];
+      for(let i=min;i<=max;i++){
+        if(!globalUsed.has(i)) available.push(i);
+      }
+      if(available.length < numWinners){
+        alert('Sisa nomor tidak cukup untuk jumlah pemenang yang diminta');
         return;
       }
 
-      sedangUndi = true;
-      let pemenangList = [];
+      // disable UI while running
+      startBtn.disabled = true;
+      downloadBtn.disabled = true;
+      resetBtn.disabled = true;
 
-      let index = 0;
-      const interval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * sisaNomor.length);
-        const nomor = sisaNomor.splice(randomIndex, 1)[0];
-        resultEl.textContent = nomor;
-        pemenangList.push(nomor);
-        nomorTerpilih[hadiah].push(nomor);
-        updateTable(hadiah);
-        index++;
-        if (index >= jumlah) {
-          clearInterval(interval);
-          sedangUndi = false;
-          resultEl.textContent = "Selesai!";
-        }
-      }, durasi);
+      // ensure prize structure exists
+      if(!prizeWinners[prize]) prizeWinners[prize] = [];
+
+      // play drumroll if available
+      const drum = document.getElementById('drumroll');
+      const clap = document.getElementById('clap');
+
+      // sequentially pick winners one-by-one
+      for(let w=0; w<numWinners; w++){
+        // rolling/spinner start
+        spinner.style.display = 'block';
+        rollingNumber.textContent = '-';
+        let startTime = Date.now();
+        // play drum
+        try { drum.currentTime = 0; drum.play(); } catch(e){ /* ignore */ }
+
+        // preview rolling: change number quickly until rollDurationSec passes
+        const previewInterval = setInterval(()=>{
+          const pick = available[Math.floor(Math.random()*available.length)];
+          rollingNumber.textContent = pick;
+        }, 70);
+
+        // await roll duration
+        await new Promise(res => setTimeout(res, rollDurationSec*1000));
+
+        clearInterval(previewInterval);
+        // select final winner for this round
+        const idx = Math.floor(Math.random()*available.length);
+        const winner = available.splice(idx,1)[0];
+        globalUsed.add(winner);
+        const timeStr = new Date().toLocaleString();
+        prizeWinners[prize].push({ num: winner, crossed: false, time: timeStr });
+
+        // stop drum, play clap
+        try { drum.pause(); } catch(e){}
+        try { clap.currentTime = 0; clap.play(); } catch(e){}
+
+        // update UI row
+        updateTable(prize);
+
+        // show final on rollingNumber
+        rollingNumber.textContent = '🎉 ' + winner;
+
+        // confetti for this winner
+        if(confettiDuration > 0) startConfetti(confettiDuration);
+
+        // small pause (0.6s) before next round starts (so user sees result)
+        await new Promise(res => setTimeout(res, 600));
+      }
+
+      // done
+      spinner.style.display = 'none';
+      rollingNumber.textContent = 'Selesai!';
+      startBtn.disabled = false;
+      downloadBtn.disabled = false;
+      resetBtn.disabled = false;
     }
 
-    function updateTable(hadiah) {
-      const container = document.getElementById("tablesContainer");
-      let tabel = document.getElementById("tabel-" + hadiah);
-      if (!tabel) {
-        const div = document.createElement("div");
-        div.innerHTML = `<h3>${hadiah}</h3>
-          <table id="tabel-${hadiah}">
-            <thead><tr><th>No</th><th>Nomor Undian</th><th>Aksi</th></tr></thead>
-            <tbody></tbody>
-          </table>`;
-        container.appendChild(div);
-        tabel = div.querySelector("table");
+    /* ====== Table update & actions ====== */
+    function updateTable(prize){
+      const historyWrap = document.getElementById('historyWrap');
+      // find or create block
+      if(!prizeTables[prize]){
+        const block = document.createElement('div');
+        block.className = 'prize-block';
+        block.innerHTML = `
+          <h3>${escapeHtml(prize)}</h3>
+          <div style="overflow:auto">
+            <table id="table-${sanitizeId(prize)}">
+              <thead><tr><th>No</th><th class="number">Nomor</th><th>Waktu</th><th>Aksi</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        `;
+        historyWrap.prepend(block); // newest on top
+        prizeTables[prize] = block.querySelector('tbody');
       }
-      const tbody = tabel.querySelector("tbody");
-      tbody.innerHTML = "";
-      nomorTerpilih[hadiah].forEach((nomor, i) => {
-        const tr = document.createElement("tr");
-        const tdNo = document.createElement("td");
-        const tdNomor = document.createElement("td");
-        const tdAksi = document.createElement("td");
+      const tbody = prizeTables[prize];
+      tbody.innerHTML = '';
+      const rows = prizeWinners[prize];
+      rows.forEach((obj, i) => {
+        const tr = document.createElement('tr');
+        if(obj.crossed) tr.classList.add('coret');
+        const noTd = document.createElement('td'); noTd.textContent = i+1;
+        const numTd = document.createElement('td'); numTd.className = 'number'; numTd.textContent = obj.num;
+        const timeTd = document.createElement('td'); timeTd.textContent = obj.time;
+        const actionsTd = document.createElement('td'); actionsTd.className = 'actions-cell';
 
-        tdNo.textContent = i + 1;
-        tdNomor.textContent = nomor;
-
-        const btnCoret = document.createElement("button");
-        btnCoret.textContent = "Coret";
-        btnCoret.onclick = () => {
-          tdNomor.classList.add("coret");
-        };
-        const btnHapusCoret = document.createElement("button");
-        btnHapusCoret.textContent = "Hapus Coretan";
-        btnHapusCoret.onclick = () => {
-          tdNomor.classList.remove("coret");
+        // coret button
+        const btnCoret = document.createElement('button');
+        btnCoret.className = 'coret-btn';
+        btnCoret.textContent = obj.crossed ? 'Tandai Tidak Coret' : 'Coret';
+        btnCoret.onclick = ()=> {
+          obj.crossed = !obj.crossed;
+          updateTable(prize);
         };
 
-        tdAksi.appendChild(btnCoret);
-        tdAksi.appendChild(btnHapusCoret);
-        tr.appendChild(tdNo);
-        tr.appendChild(tdNomor);
-        tr.appendChild(tdAksi);
+        // remove entry (hapus pemenang) - optional
+        const btnRemove = document.createElement('button');
+        btnRemove.className = 'remove-btn';
+        btnRemove.textContent = 'Hapus';
+        btnRemove.onclick = ()=> {
+          // remove from prizeWinners and also free up number from globalUsed
+          prizeWinners[prize].splice(i,1);
+          globalUsed.delete(obj.num);
+          updateTable(prize);
+        };
+
+        actionsTd.appendChild(btnCoret);
+        actionsTd.appendChild(btnRemove);
+
+        tr.appendChild(noTd);
+        tr.appendChild(numTd);
+        tr.appendChild(timeTd);
+        tr.appendChild(actionsTd);
         tbody.appendChild(tr);
       });
     }
 
-    function downloadExcel() {
-      let csv = "Hadiah,No,Nomor Undian,Coret\n";
-      for (const hadiah in nomorTerpilih) {
-        const rows = document.querySelectorAll(`#tabel-${hadiah} tbody tr`);
-        rows.forEach(row => {
-          const no = row.children[0].textContent;
-          const nomor = row.children[1].textContent;
-          const coret = row.children[1].classList.contains("coret") ? "Ya" : "Tidak";
-          csv += `"${hadiah}",${no},${nomor},${coret}\n`;
+    /* ====== Download CSV (with crossed numbers visually struck using combining char) ====== */
+    function downloadCSV(){
+      let csv = 'Hadiah,No,Nomor,Coret,Waktu\\n';
+      for(const prize in prizeWinners){
+        prizeWinners[prize].forEach((obj, idx)=>{
+          const coretFlag = obj.crossed ? 'Ya' : 'Tidak';
+          const nomorValue = obj.crossed ? strikeText(String(obj.num)) : String(obj.num);
+          // escape quotes in prize
+          const prizeEsc = '"' + String(prize).replace(/"/g,'""') + '"';
+          csv += `${prizeEsc},${idx+1},${nomorValue},${coretFlag},"${obj.time}"\\n`;
         });
       }
-      const blob = new Blob([csv], { type: "text/csv" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "hasil_undian.csv";
-      link.click();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'hasil_undian_v6.csv';
+      a.click();
+      URL.revokeObjectURL(url);
     }
+
+    /* ====== Reset ====== */
+    function resetAll(){
+      if(!confirm('Reset undian? Semua data pemenang akan hilang.')) return;
+      globalUsed.clear();
+      for(const k in prizeWinners) delete prizeWinners[k];
+      for(const k in prizeTables) delete prizeTables[k];
+      document.getElementById('historyWrap').innerHTML = '';
+      rollingNumber.textContent = '-';
+      stopConfetti();
+    }
+
+    /* ====== Helpers ====== */
+    function sanitizeId(str){ return str.replace(/[^a-z0-9\-_]/gi,'_'); }
+    function escapeHtml(text){
+      return text.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]) );
+    }
+
   </script>
 </body>
 </html>
