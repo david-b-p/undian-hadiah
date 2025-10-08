@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Undian Acak HKBP Majapahit Mojokerto</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      position: relative;
+    }
+    header img {
+      position: absolute;
+      left: 20px;
+      height: 50px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    main {
+      margin: 20px;
+    }
+    .input-section {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: inline-block;
+    }
+    input, select, button {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #003366;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0055aa;
+    }
+    #result {
+      font-size: 40px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background: #003366;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .coret {
+      text-decoration: line-through;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/HKBP_Logo.png" alt="Logo HKBP">
+    <h1>Pesta Parheheon Ina - Gotilon HKBP Majapahit Mojokerto</h1>
+  </header>
+
+  <main>
+    <div class="input-section">
+      <h3>Pengaturan Undian</h3>
+      <div>
+        <label>Nama Hadiah:</label>
+        <input type="text" id="hadiah" placeholder="Contoh: Sabun Cuci">
+      </div>
+      <div>
+        <label>Nomor Minimum:</label>
+        <input type="number" id="min" value="1">
+        <label>Nomor Maksimum:</label>
+        <input type="number" id="max" value="100">
+      </div>
+      <div>
+        <label>Jumlah Pemenang:</label>
+        <input type="number" id="jumlah" value="1" min="1">
+      </div>
+      <div>
+        <label>Durasi Tiap Undian (detik):</label>
+        <input type="number" id="durasi" value="3" min="1" max="10">
+      </div>
+      <button onclick="undi()">Mulai Undian</button>
+      <button onclick="downloadExcel()">Download Excel</button>
+    </div>
+
+    <div id="result">-</div>
+
+    <div id="tablesContainer"></div>
+  </main>
+
+  <script>
+    let nomorTerpilih = {};
+    let sedangUndi = false;
+
+    function undi() {
+      if (sedangUndi) return;
+      const hadiah = document.getElementById("hadiah").value.trim();
+      const min = parseInt(document.getElementById("min").value);
+      const max = parseInt(document.getElementById("max").value);
+      const jumlah = parseInt(document.getElementById("jumlah").value);
+      const durasi = parseInt(document.getElementById("durasi").value) * 1000;
+      const resultEl = document.getElementById("result");
+
+      if (!hadiah) return alert("Masukkan nama hadiah!");
+      if (min >= max) return alert("Rentang angka tidak valid!");
+      if (!nomorTerpilih[hadiah]) nomorTerpilih[hadiah] = [];
+
+      let sisaNomor = [];
+      for (let i = min; i <= max; i++) {
+        if (!Object.values(nomorTerpilih).flat().includes(i)) sisaNomor.push(i);
+      }
+
+      if (sisaNomor.length < jumlah) {
+        alert("Sisa nomor tidak cukup!");
+        return;
+      }
+
+      sedangUndi = true;
+      let pemenangList = [];
+
+      let index = 0;
+      const interval = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * sisaNomor.length);
+        const nomor = sisaNomor.splice(randomIndex, 1)[0];
+        resultEl.textContent = nomor;
+        pemenangList.push(nomor);
+        nomorTerpilih[hadiah].push(nomor);
+        updateTable(hadiah);
+        index++;
+        if (index >= jumlah) {
+          clearInterval(interval);
+          sedangUndi = false;
+          resultEl.textContent = "Selesai!";
+        }
+      }, durasi);
+    }
+
+    function updateTable(hadiah) {
+      const container = document.getElementById("tablesContainer");
+      let tabel = document.getElementById("tabel-" + hadiah);
+      if (!tabel) {
+        const div = document.createElement("div");
+        div.innerHTML = `<h3>${hadiah}</h3>
+          <table id="tabel-${hadiah}">
+            <thead><tr><th>No</th><th>Nomor Undian</th><th>Aksi</th></tr></thead>
+            <tbody></tbody>
+          </table>`;
+        container.appendChild(div);
+        tabel = div.querySelector("table");
+      }
+      const tbody = tabel.querySelector("tbody");
+      tbody.innerHTML = "";
+      nomorTerpilih[hadiah].forEach((nomor, i) => {
+        const tr = document.createElement("tr");
+        const tdNo = document.createElement("td");
+        const tdNomor = document.createElement("td");
+        const tdAksi = document.createElement("td");
+
+        tdNo.textContent = i + 1;
+        tdNomor.textContent = nomor;
+
+        const btnCoret = document.createElement("button");
+        btnCoret.textContent = "Coret";
+        btnCoret.onclick = () => {
+          tdNomor.classList.add("coret");
+        };
+        const btnHapusCoret = document.createElement("button");
+        btnHapusCoret.textContent = "Hapus Coretan";
+        btnHapusCoret.onclick = () => {
+          tdNomor.classList.remove("coret");
+        };
+
+        tdAksi.appendChild(btnCoret);
+        tdAksi.appendChild(btnHapusCoret);
+        tr.appendChild(tdNo);
+        tr.appendChild(tdNomor);
+        tr.appendChild(tdAksi);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function downloadExcel() {
+      let csv = "Hadiah,No,Nomor Undian,Coret\n";
+      for (const hadiah in nomorTerpilih) {
+        const rows = document.querySelectorAll(`#tabel-${hadiah} tbody tr`);
+        rows.forEach(row => {
+          const no = row.children[0].textContent;
+          const nomor = row.children[1].textContent;
+          const coret = row.children[1].classList.contains("coret") ? "Ya" : "Tidak";
+          csv += `"${hadiah}",${no},${nomor},${coret}\n`;
+        });
+      }
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "hasil_undian.csv";
+      link.click();
+    }
+  </script>
+</body>
+</html>
