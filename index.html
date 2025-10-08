@@ -455,16 +455,16 @@
           updateTable(prize);
         };
 
-        // remove entry (hapus pemenang) - optional
-        const btnRemove = document.createElement('button');
-        btnRemove.className = 'remove-btn';
-        btnRemove.textContent = 'Hapus';
-        btnRemove.onclick = ()=> {
-          // remove from prizeWinners and also free up number from globalUsed
-          prizeWinners[prize].splice(i,1);
-          globalUsed.delete(obj.num);
-          updateTable(prize);
-        };
+        // // remove entry (hapus pemenang) - optional
+        // const btnRemove = document.createElement('button');
+        // btnRemove.className = 'remove-btn';
+        // btnRemove.textContent = 'Hapus';
+        // btnRemove.onclick = ()=> {
+        //   // remove from prizeWinners and also free up number from globalUsed
+        //   prizeWinners[prize].splice(i,1);
+        //   globalUsed.delete(obj.num);
+        //   updateTable(prize);
+        // };
 
         actionsTd.appendChild(btnCoret);
         actionsTd.appendChild(btnRemove);
